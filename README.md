@@ -1,8 +1,12 @@
+## 🧠 Problem Statement
+
+Fish diseases in aquaculture often go undetected until severe damage occurs, leading to economic loss. This system provides an AI-based solution for early detection and treatment recommendation.
+
 # Fish Disease Detection and Advisory System
 
 An AI-powered aquaculture health analysis system that detects fish diseases using deep learning with EfficientNet. The system provides multilingual support (English, Hindi, Telugu) and generates comprehensive PDF reports with AI-powered diagnosis and treatment recommendations using OpenRouter API.
 
-**Live Demo**: Available at `http://localhost:5000` after setup
+**Live Demo**: Run locally at http://localhost:5000 after setup
 
 ---
 
@@ -142,8 +146,6 @@ python app.py
 ---
 
 ## 📸 Screenshots
-
-## Screenshots
 
 ### Home Page
 ![Home Page](https://github.com/user-attachments/assets/e47d407e-7383-49c9-8211-6fc031fc92a6)
