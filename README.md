@@ -99,10 +99,6 @@ This project is open source and available under the MIT License.
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Author
-
-Developed for aquaculture health monitoring and AI-powered disease detection.
-
 ---
 
 **Note**: Make sure to never commit the `.env` file containing your API keys to the repository.
