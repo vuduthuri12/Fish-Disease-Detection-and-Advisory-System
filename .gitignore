@@ -46,6 +46,8 @@ wheels/
 
 # Keras/TensorFlow
 .keras/
+*.keras
+*.h5
 
 # Flask runtime
 instance/
@@ -58,9 +60,10 @@ fonts/
 !fonts/OFL.txt
 
 # Large model files
-*.h5
 *.pkl
 *.pickle
+*.pth
+*.pt
 
 # macOS
 .DS_Store
