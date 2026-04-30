@@ -143,19 +143,18 @@ python app.py
 
 ## 📸 Screenshots
 
+## Screenshots
+
 ### Home Page
-![Home Page](<img width="1600" height="825" alt="10" src="https://github.com/user-attachments/assets/e47d407e-7383-49c9-8211-6fc031fc92a6" />
-)
+![Home Page](https://github.com/user-attachments/assets/e47d407e-7383-49c9-8211-6fc031fc92a6)
 *Web interface for uploading fish images*
 
 ### Detection Result
-![Result Page](<img width="1288" height="721" alt="WhatsApp Image 2026-04-28 at 12 04 03" src="https://github.com/user-attachments/assets/68ce1393-ccf9-48ae-9f26-1c5841acb48a" />
-)
+![Result Page](https://github.com/user-attachments/assets/68ce1393-ccf9-48ae-9f26-1c5841acb48a)
 *Disease prediction with confidence scores*
 
 ### PDF Report
-![PDF Report](<img width="1374" height="751" alt="WhatsApp Image 2026-04-28 at 12 06 56" src="https://github.com/user-attachments/assets/fd8f5469-ebe0-445a-af60-d6e52b0aa132" />
-)
+![PDF Report](https://github.com/user-attachments/assets/fd8f5469-ebe0-445a-af60-d6e52b0aa132)
 *Multilingual diagnosis report in PDF format*
 
 ---
