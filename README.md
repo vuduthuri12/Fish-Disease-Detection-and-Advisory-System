@@ -106,7 +106,7 @@ pip install -r requirements.txt
 ### 4. Download Model
 The trained model needs to be downloaded separately:
 
-- **Option A**: Download from [Google Drive](https://drive.google.com/file/d/YOUR_MODEL_ID/view) (add your link)
+- **Option A**: Download from [Google Drive](https://drive.google.com/file/d/1S_oyhqNGb7i5PNzhNZC3Up5o10ddY-z0/view?usp=drive_link) (add your link)
 - **Option B**: Download from [Kaggle](https://www.kaggle.com/your-profile) (add your link)
 
 Extract and place `final_fish_model.keras` in the project root directory.
