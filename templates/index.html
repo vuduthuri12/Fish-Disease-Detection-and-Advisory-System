@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaHealth AI — Fish Disease Detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="app-wrapper">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-inner">
+            <div class="logo">
+                <div class="logo-icon">🐟</div>
+                <div>
+                    <h1 class="logo-title">AquaHealth AI</h1>
+                    <p class="logo-sub">Fish Disease Detection System</p>
+                </div>
+            </div>
+            <div class="header-badge">Powered by AI</div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Upload Section -->
+        <section class="upload-card card" id="upload-section">
+            <h2 class="section-title">Upload Fish Image</h2>
+            <p class="section-desc">Upload a clear photo of the fish to detect diseases instantly using our AI model.</p>
+
+            <label class="dropzone" id="dropzone" for="image-upload">
+                <input id="image-upload" type="file" name="image" accept="image/*">
+                <div class="dropzone-content" id="dropzone-content">
+                    <div class="dropzone-icon">📷</div>
+                    <p class="dropzone-text">Click or drag &amp; drop image here</p>
+                    <p class="dropzone-hint">Supports JPG, PNG, WEBP</p>
+                </div>
+                <div id="preview-section" style="display:none;">
+                    <img id="preview-image" alt="Preview">
+                    <p id="preview-filename"></p>
+                </div>
+            </label>
+
+            <button id="submit-button" class="btn-primary" disabled>
+                <span class="btn-icon">🔍</span> Analyze Fish
+            </button>
+        </section>
+
+        <!-- Loading -->
+        <div id="loading" class="loading-card" style="display:none;">
+            <div class="spinner"></div>
+            <p>Analyzing image with AI model...</p>
+        </div>
+
+        <!-- Results Section -->
+        <section id="result-section" style="display:none;">
+
+            <!-- Diagnosis Card -->
+            <div class="card result-card" id="diagnosis-card">
+                <div class="result-header">
+                    <div>
+                        <h2 class="section-title">Diagnosis Result</h2>
+                        <p class="section-desc">AI-powered disease classification</p>
+                    </div>
+                    <div class="confidence-badge" id="confidence-badge"></div>
+                </div>
+
+                <div class="disease-banner" id="disease-banner">
+                    <span class="disease-icon" id="disease-icon"></span>
+                    <div>
+                        <div class="disease-label">Detected Condition</div>
+                        <div class="disease-name" id="disease-name"></div>
+                    </div>
+                </div>
+
+                <div class="result-grid">
+                    <div class="result-image-wrap">
+                        <img id="result-image" alt="Uploaded fish">
+                    </div>
+                    <div class="top3-wrap">
+                        <h3 class="sub-title">Top Predictions</h3>
+                        <ul id="top3-list" class="top3-list"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Cards -->
+            <div class="info-grid" id="info-grid" style="display:none;">
+                <div class="info-card symptoms-card">
+                    <div class="info-icon">🩺</div>
+                    <h4>Symptoms</h4>
+                    <p id="info-symptoms"></p>
+                </div>
+                <div class="info-card causes-card">
+                    <div class="info-icon">⚠️</div>
+                    <h4>Causes</h4>
+                    <p id="info-causes"></p>
+                </div>
+                <div class="info-card treatment-card">
+                    <div class="info-icon">💊</div>
+                    <h4>Treatment</h4>
+                    <p id="info-treatment"></p>
+                </div>
+                <div class="info-card prevention-card">
+                    <div class="info-icon">🛡️</div>
+                    <h4>Prevention</h4>
+                    <p id="info-prevention"></p>
+                </div>
+            </div>
+
+            <!-- Chat Section -->
+            <div class="card chat-card">
+                <div class="advice-header">
+                    <h2 class="section-title">AI Assistant & Report</h2>
+                    <div class="lang-controls">
+                        <label for="language-select">Language:</label>
+                        <select id="language-select" class="lang-select">
+                            <option value="english">English</option>
+                            <option value="hindi">Hindi</option>
+                            <option value="telugu">Telugu</option>
+                        </select>
+                    </div>
+                </div>
+                <p class="section-desc">Ask anything about the diagnosed disease or download the full report below.</p>
+
+                <div id="chat-history" class="chat-history"></div>
+
+                <form id="chat-form" class="chat-input-row">
+                    <input id="chat-input" type="text" class="chat-input" placeholder="e.g. What medicine should I use?" autocomplete="off">
+                    <button type="submit" class="btn-send" id="send-btn">Send</button>
+                </form>
+
+                <div class="quick-questions">
+                    <span class="quick-label">Quick:</span>
+                    <button class="quick-btn" onclick="askQuick('What are the best treatment options?')">Treatment</button>
+                    <button class="quick-btn" onclick="askQuick('How to prevent this disease spreading?')">Prevention</button>
+                    <button class="quick-btn" onclick="askQuick('What should I feed the fish during recovery?')">Feeding</button>
+                    <button class="quick-btn" onclick="askQuick('Is this disease contagious?')">Contagion</button>
+                </div>
+
+                <button id="download-btn" class="btn-outline" style="width: 100%; justify-content: center; margin-top: 24px;">
+                    <span>📄</span> Download Health Report
+                </button>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>AquaHealth AI &copy; 2026 — For educational &amp; aquaculture use. Always consult a licensed veterinarian.</p>
+    </footer>
+</div>
+
+<script>
+// =====================
+// State
+// =====================
+let predictionData = null;
+let lastAiResponse = "";
+
+// =====================
+// Elements
+// =====================
+const fileInput     = document.getElementById('image-upload');
+const dropzone      = document.getElementById('dropzone');
+const previewSec    = document.getElementById('preview-section');
+const previewImg    = document.getElementById('preview-image');
+const previewName   = document.getElementById('preview-filename');
+const submitBtn     = document.getElementById('submit-button');
+const loadingDiv    = document.getElementById('loading');
+const resultSec     = document.getElementById('result-section');
+const chatForm      = document.getElementById('chat-form');
+const chatInput     = document.getElementById('chat-input');
+const chatHistory   = document.getElementById('chat-history');
+const downloadBtn   = document.getElementById('download-btn');
+
+// =====================
+// Image Preview
+// =====================
+fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file || !file.type.startsWith('image/')) { alert('Please upload a valid image.'); return; }
+    const reader = new FileReader();
+    reader.onload = e => {
+        previewImg.src = e.target.result;
+        previewName.textContent = file.name;
+        previewSec.style.display = 'block';
+        document.getElementById('dropzone-content').style.display = 'none';
+        submitBtn.disabled = false;
+    };
+    reader.readAsDataURL(file);
+});
+
+// Drag & Drop
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) { fileInput.files = e.dataTransfer.files; fileInput.dispatchEvent(new Event('change')); }
+});
+
+// =====================
+// Predict
+// =====================
+submitBtn.addEventListener('click', async () => {
+    if (!fileInput.files[0]) return;
+    const formData = new FormData();
+    formData.append('image', fileInput.files[0]);
+
+    submitBtn.disabled = true;
+    loadingDiv.style.display = 'flex';
+    resultSec.style.display = 'none';
+
+    try {
+        const res  = await fetch('/predict', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.error) { alert('Error: ' + data.error); return; }
+
+        predictionData = data;
+        displayResults(data);
+    } catch(err) {
+        alert('Prediction failed: ' + err.message);
+    } finally {
+        loadingDiv.style.display = 'none';
+        submitBtn.disabled = false;
+    }
+});
+
+function displayResults(data) {
+    const isHealthy = data.prediction === 'Healthy Fish';
+
+    // Diagnosis banner
+    document.getElementById('disease-name').textContent = data.prediction;
+    document.getElementById('disease-icon').textContent = isHealthy ? '✅' : '⚠️';
+    document.getElementById('confidence-badge').textContent = `${data.confidence}% confidence`;
+
+    const banner = document.getElementById('disease-banner');
+    banner.className = 'disease-banner ' + (isHealthy ? 'healthy' : 'diseased');
+
+    // Result image
+    document.getElementById('result-image').src = data.img_path;
+
+    // Top 3
+    const list = document.getElementById('top3-list');
+    list.innerHTML = '';
+    data.top3.forEach((item, i) => {
+        const li = document.createElement('li');
+        li.className = 'top3-item';
+        li.innerHTML = `
+            <div class="top3-label"><span class="top3-rank">#${i+1}</span>${item.label}</div>
+            <div class="top3-bar-wrap">
+                <div class="top3-bar" style="width:${item.confidence}%"></div>
+                <span class="top3-pct">${item.confidence}%</span>
+            </div>`;
+        list.appendChild(li);
+    });
+
+    // Info cards
+    if (data.disease_info && Object.keys(data.disease_info).length) {
+        const info = data.disease_info;
+        document.getElementById('info-symptoms').textContent  = info.symptoms  || '—';
+        document.getElementById('info-causes').textContent    = info.causes    || '—';
+        document.getElementById('info-treatment').textContent = info.treatment || '—';
+        document.getElementById('info-prevention').textContent= info.prevention|| '—';
+        document.getElementById('info-grid').style.display    = 'grid';
+    }
+
+    // Chat welcome
+    chatHistory.innerHTML = '';
+    lastAiResponse = data.advice; // Initial advice
+    addBotMessage(`### Initial AI Analysis\n\n${data.advice}`);
+
+    resultSec.style.display = 'block';
+    resultSec.scrollIntoView({ behavior: 'smooth' });
+}
+
+function formatAdvice(text) {
+    if (!text) return '<p>No advice available.</p>';
+    return text
+        .split('\n')
+        .filter(l => l.trim())
+        .map(line => {
+            line = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            if (/^\d+\./.test(line.trim())) return `<p class="advice-item numbered">${line.trim()}</p>`;
+            if (line.trim().startsWith('*') || line.trim().startsWith('-')) return `<p class="advice-item bullet">${line.replace(/^[\*\-]\s*/,'')}</p>`;
+            if (line.trim().endsWith(':') || line.match(/^#+\s/)) return `<h4 class="advice-heading">${line.replace(/^#+\s*/,'')}</h4>`;
+            return `<p class="advice-item">${line}</p>`;
+        }).join('');
+}
+
+// =====================
+// Chat
+// =====================
+function addUserMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'chat-msg user-msg';
+    div.innerHTML = `<div class="msg-bubble">${escHtml(text)}</div>`;
+    chatHistory.appendChild(div);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+function addBotMessage(text) {
+    const div = document.createElement('div');
+    div.className = 'chat-msg bot-msg';
+    const formatted = formatAdvice(text);
+    div.innerHTML = `<div class="bot-avatar">🤖</div><div class="msg-bubble">${formatted}</div>`;
+    chatHistory.appendChild(div);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+function addTypingIndicator() {
+    const div = document.createElement('div');
+    div.className = 'chat-msg bot-msg typing-indicator';
+    div.id = 'typing';
+    div.innerHTML = `<div class="bot-avatar">🤖</div><div class="msg-bubble"><span></span><span></span><span></span></div>`;
+    chatHistory.appendChild(div);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+}
+
+function escHtml(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = chatInput.value.trim();
+    if (!msg || !predictionData) return;
+    chatInput.value = '';
+    sendChatMessage(msg);
+});
+
+async function sendChatMessage(msg) {
+    addUserMessage(msg);
+    addTypingIndicator();
+    document.getElementById('send-btn').disabled = true;
+
+    try {
+        const res  = await fetch('/chat', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                message:  msg,
+                disease:  predictionData ? predictionData.prediction : 'Unknown',
+                language: document.getElementById('language-select').value
+            })
+        });
+        const data = await res.json();
+        document.getElementById('typing')?.remove();
+        if (data.response) {
+            lastAiResponse = data.response;
+            addBotMessage(data.response);
+        } else {
+            addBotMessage('No response received.');
+        }
+    } catch(err) {
+        document.getElementById('typing')?.remove();
+        addBotMessage('Sorry, I could not connect to the AI assistant. Please try again.');
+    } finally {
+        document.getElementById('send-btn').disabled = false;
+    }
+}
+
+function askQuick(q) { chatInput.value = q; chatForm.dispatchEvent(new Event('submit')); }
+
+// =====================
+// PDF Download — Fixed
+// =====================
+downloadBtn.addEventListener('click', async () => {
+    if (!predictionData) { alert('Please make a prediction first.'); return; }
+
+    downloadBtn.textContent = '⏳ Generating...';
+    downloadBtn.disabled = true;
+
+    try {
+        const payload = {
+            disease:    predictionData.prediction,
+            advice:     lastAiResponse,
+            confidence: predictionData.confidence,
+            top3:       predictionData.top3,
+            language:   document.getElementById('language-select').value
+        };
+
+        const res = await fetch('/download-pdf', {
+            method:  'POST',
+            headers: {'Content-Type': 'application/json'},
+            body:    JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            throw new Error(err.error || 'PDF generation failed');
+        }
+
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `Fish_Report_${predictionData.prediction.replace(/\s+/g,'_')}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch(err) {
+        alert('Error downloading PDF: ' + err.message);
+    } finally {
+        downloadBtn.innerHTML = '<span>📄</span> Download PDF Report';
+        downloadBtn.disabled = false;
+    }
+});
+</script>
+</body>
+</html>
